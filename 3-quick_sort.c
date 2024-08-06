@@ -2,24 +2,17 @@
 
 /**
  * swap_integer - Swaps two integers in an array and prints the array
- * @array: pointer to the integer array
- * @i: pointer to the first integer
- * @j: pointer to the second integer
- * @size: the size of the array
+ * @a: pointer to the first integer
+ * @b: pointer to the second integer
  */
 
-void swap_integer(int *array, int i, int j, size_t size)
+void swap_integer(int *a, int *b)
 {
 	int temp;
 
-	if (array[i] != array[j])
-	{
-		temp = array[i];
-		array[i] = array[j];
-		array[j] = temp;
-		print_array(array, size);
-		print_array(array, size);
-	}
+	temp = *a;
+	*a = *b;
+	*b = temp;
 }
 
 /**
@@ -31,20 +24,30 @@ void swap_integer(int *array, int i, int j, size_t size)
  * Return: the final index of the pivot
  */
 
-int partition(int *array, int start, int end, size_t size)
+int partition(int *array, size_t size, int start, int end)
 {
-	int i, pivot = array[end];
+	int *pivot, above, below;
 
-	for (i = start; i <= end; i++)
+	pivot = array + end;
+	for (above = below = start; below < end; below++)
 	{
-		if (array[i] < pivot)
+		if (array[below] < *pivot)
 		{
-			swap_integer(array, start, i, size);
-			start++;
+			if (above < below)
+			{
+				swap_integer(array + below, array + above);
+				print_array(array, size);
+			}
+			above++;
 		}
 	}
-	swap_integer(array, start, end, size);
-	return (start);
+
+	if (array[above] > *pivot)
+	{
+		swap_integer(array + above, pivot);
+		print_array(array, size);
+	}
+	return (above);
 }
 
 /**
@@ -55,17 +58,16 @@ int partition(int *array, int start, int end, size_t size)
  * @size: size of the array
  */
 
-void sort_recursion(int *array, int start, int end, size_t size)
+void sort_recursion(int *array, size_t size, int start, int end)
 {
 	int part;
 
-	if (start >= end)
-		return;
-
-
-	part = partition(array, start, end, size);
-	sort_recursion(array, start, part - 1, size);
-	sort_recursion(array, part + 1, end, size);
+	if (end - start > 0)
+	{
+		part = partition(array, size, start, end);
+		sort_recursion(array, size, start, part - 1);
+		sort_recursion(array, size, part + 1, end);
+	}
 
 }
 
@@ -77,7 +79,7 @@ void sort_recursion(int *array, int start, int end, size_t size)
 
 void quick_sort(int *array, size_t size)
 {
-	if (size < 2)
+	if (array == NULL || size < 2)
 		return;
-	sort_recursion(array, 0, size - 1, size);
+	sort_recursion(array, size, 0, size - 1);
 }
